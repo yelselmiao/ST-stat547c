@@ -1,0 +1,71 @@
+\section{Proof of Hoeffding’s Inequality}
+\begin{definition}
+(Hoeffding's Inequality)
+Let $X_{1},...,X_{m}$ be iid random variables such that $a_{i}<X<b_{i}$ with probability $1$. Let $S_{n} = \Sigma_{i=1}^{n}X_{i}$, then for any $t>0$,  
+\begin{equation*}
+    P(|S_{n} - E[S_{n}]|\geq t) \leq 2e^{- \frac{2t^2}{\Sigma_{i=1}^{n}(b_{i}-a_{i}^{2})}}
+\end{equation*}
+\end{definition}
+
+\begin{proof}
+The key to of this proof is the following upper bound: if $X$ is a random variable with $E[X]=0$ and $a \leq X \leq b,$ then
+$$
+E\left[e^{s X}\right] \leq e^{\frac{s^{2}(b-a)^{2}}{8}}
+$$
+To derive the upper bound, by the convexity of the exponential function,
+$$
+e^{s x} \leq \frac{x-a}{b-a} e^{s b}+\frac{b-x}{b-a} e^{s a}, \text { for } a \leq x \leq b
+$$
+
+Therefore,
+$$
+\begin{aligned}
+E\left[e^{s X}\right] & \leq E\left[\frac{X-a}{b-a}\right] e^{s b}+E\left[\frac{b-X}{b-a}\right] e^{s a} \\
+&=\frac{b}{b-a} e^{s a}-\frac{a}{b-a} e^{s b}, \text { since } E[X]=0 \\
+&=\left(1-\theta+\theta e^{s(b-a)}\right) e^{-\theta s(b-a)}, \text { where } \theta=\frac{-a}{b-a}
+\end{aligned}
+$$
+Now let
+$$
+u=s(b-a) \text { and define } \phi(u) \equiv-\theta u+\log \left(1-\theta+\theta e^{u}\right)
+$$
+Then we have
+$$
+E\left[e^{s X}\right] \leq\left(1-\theta+\theta e^{s(b-a)}\right) e^{-\theta s(b-a)}=e^{\phi(u)}
+$$
+Using Taylor's expansion:
+$$
+\phi(u)=\phi(0)+u \phi^{\prime}(0)+\frac{u^{2}}{2} \phi^{\prime \prime}(v) \text { for some } v \in[0, u]
+$$
+
+$$
+\begin{aligned}
+\phi^{\prime}(u) &=-\theta+\frac{\theta e^{u}}{1-\theta+\theta e^{u}} \Rightarrow \phi^{\prime}(u)=0 \\
+\phi^{\prime \prime}(u) &=\frac{\theta e^{u}}{1-\theta+\theta e^{u}}\left(1-\frac{\theta e^{u}}{1-\theta+\theta e^{u}}\right) \\
+&=\rho(1-\rho)
+\end{aligned}
+$$
+$\mathrm{Now}, \phi^{\prime \prime}(u)$ is maximized by
+$$
+\rho=\frac{\theta e^{u}}{1-\theta+\theta e^{u}}=\frac{1}{2} \Rightarrow \phi^{\prime \prime}(u) \leq \frac{1}{4}
+$$
+So,
+$$
+\begin{aligned}
+\phi(u) & \leq \frac{u^{2}}{8}=\frac{s^{2}(b-a)^{2}}{8} \\
+\Rightarrow E\left[e^{s X}\right] & \leq e^{\frac{s^{2}(b-a)^{2}}{8}}
+\end{aligned}
+$$
+
+Now, we can apply this upper bound to derive Hoeffding's inequality.
+$$
+\begin{aligned}
+P\left(S_{n}-E\left[S_{n}\right] \geq t\right) & \leq e^{-s t} \prod_{i=1}^{n} E\left[e^{s\left(L_{i}-E\left[L_{i}\right]\right)}\right] \\
+& \leq e^{-s t} \prod_{i=1}^{n} e^{\frac{s^{2}\left(b_{i}-a_{i}\right)^{2}}{8}} \\
+&=e^{-s t} e^{s^{2} \sum_{i=1}^{n} \frac{\left(b_{i}-a_{i}\right)^{2}}{8}} \\
+&=e^{\frac{-2 t^{2}}{\sum_{i=1}^{n}\left(b_{i}-a_{i}\right)^{2}}} \\
+& \text { by choosing } s=\frac{4 t}{\sum_{i=1}^{n}\left(b_{i}-a_{i}\right)^{2}}
+\end{aligned}
+$$
+Similarly, $P\left(E\left[S_{n}\right]-S_{n} \geq t\right) \leq e^{\frac{-2 t^{2}}{\sum_{i=1}^{n}\left(b_{i}-a_{i}\right)^{2}}}$ . This completes the proof of the Hoeffding's theorem. 
+\end{proof}

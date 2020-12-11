@@ -3,3 +3,29 @@
 % open questions section
 
 \section{Open questions and research directions}
+\subsection{Is small or big hypothesis class better?}
+In corollary 1, we propose that if we are able to find a hypothesis $h \in \mathcal{H}$ where \mathcal{H} has finite with $m$w independent random labeled training examples, then for any strictly positive pair $(\delta, \varepsilon)$ we can assert with probability $1-\delta$ that the error of $h$ is less than $ε$ provided that:
+\begin{equation*}
+    m \geq \frac{\ln (|\mathcal{H}|)+\ln \left(\frac{1}{\delta}\right)}{\epsilon}
+\end{equation*}
+We can see that when deciding the sample size $m$ sufficient for PAC learning, the size of hypothesis class $|\mathcal{H}|$ plays an important role. The larger the size of the hypothesis space, the more examples we need. We only know in our case the hypothesis class is finite, so why it is the case?\\
+
+To approach this problem, I would like to start from a simplest example: labelling a sequence of numbers $1$ to $30$ as $+$ or $-$. We may think of labelling the every prime number as $+$, or even labelling all odd number as $-$. In general, a hypothesis is a customized rule of labelling, and we are the rule maker. Before randomly sampling a training set, let's come up with $50$ hypothesis. \\
+
+Training each hypothesis on the training set, we can score the performance of each hypothesis based on the empirical error $\operatorname{err}_{S}(h)$ on the training data. Based on the ERM rule, we will pick the hypothesis with the least error on the training set. Imagine that the set of all of our hypotheses was our hypothesis class $\mathcal{H}$ and that the our learning algorithm ERM has just output this least-error hypothesis which we will call $h$. If we test $h$ to see how it preforms on test data that is labeled according to the same rule. It is possible that the $h$ will have terrible performance on the test set. \\
+
+The basic idea here is that we have so many hypotheses that one was bound to do very well; however, it did not generalize well to the test set because the test set is totally random, so we cannot expect it to generalize. This shows us that we should expect the performance getting worse as hypothesis classes grow larger; good performance of a hypothesis drawn from a large class on a training set may not tell us very much at all about how well it will generalize, unless we compensate for this larger class with more appropriately large amount of data. In other words, learning without restricting the hypothesis may result in overfitting.\\
+
+As I was playing with this question, I found that it is indeed the justification for a fundamental theorem in the statistical learning theorem called ``Occam’s Razor". Now we know a smaller hypothesis class is usually better, so is there a way to concretely decide the cutoff of feasible hypothesis class size? 
+
+\subsection{How small a hypothesis class should be?}
+The largest obstacles to answering this question would be understanding the sufficient and necessary condition for learning, which is commonly called the VC-dimension. Even though I did not cover the learnability of infinite class in this report, I think some examples of infinite-cardinality hypothesis classes will fully demonstrate the consequence of not restricting hypothesis class, such as the disjunction over $n$ boolean variables. Vapnik and Chervonenkis discovered that a parameter the VC-dimension controls the learnability. To figure out in what way VC-dimension decides learnable hypothesis, we can explore the 
+VC-dimension on both learnable and unlearnble examples in both finite and infinite hypothesis class:
+\begin{itemize}
+    \item Positive half-lines
+    \item Axis-aligned rectangles
+    \item Convex polygons in Euclidean plane
+    \item disjunctive formulas (DNF) (most important)
+    \item finite classes
+\end{itemize}
+Comparing the these examples, we may discover what exactly characterizes what is learnable in the statistical (PAC) learning model for both finite and infinite hypothesis classes. While reading papers for this problem, I also notice there is another important concept we should pay attention along with the VC-dimension, which is sample complexity. Exploration on the relationship between VC-dimension, learnabilty, and sample complexity will be crucial steps for us to answer our question. 

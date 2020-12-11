@@ -1,0 +1,174 @@
+
+
+\section{Theorem and Results}
+
+%\newtheorem{claim}{Claim}
+\newtheorem{theorem}{Theorem}
+\newtheorem{corollary}{Corollary}
+
+\subsection{Finite Classes are PAC Learnable through ERM}
+
+Let $\mathcal{H}$ be a finite hypothesis class. For example, $\mathcal{H}$ can be the set of all predictors that can be implemented by a C++ program whose length is at most k bits. The learning algorithm is allowed to use the training set for determining which predictor to choose from the hypothesis class H. In particular, we will analyze the performance of the ERM learning rule:
+\begin{equation*}
+    h_{\mathcal{S}} \in \operatorname{argmin}_{h \in \mathcal{H}} \operatorname{err}_{\mathcal{S}} (h). 
+\end{equation*}
+This restriction will raise an issue for hypothesis that does not generalize well. A potential solution is to add a additional assumption: 
+\begin{definition}{\textbf{(Realizability assumption)}}
+$\exists f \in \mathcal{H}$ such that $\operatorname{err}_{\mathcal{D}}(f) = 0$. This assumption implies that for any training set $\mathcal{S}$, we have $\operatorname{err}_{\mathcal{S}}(f) = 0$ with probability $1$.\cite{Liang:2016}
+\end{definition}
+
+From the realizability assumption and the definition of the ERM $h_{ERM} = \operatorname{argmin}_{h \in \mathcal{H}} \operatorname{err}_{\mathcal{S}}(h)$, we have that $\operatorname{err}_{\mathcal{S}}(h) = 0$ with probability 1. We are interested in the generalization error $\operatorname{err}_{D}$. Since $\operatorname{err}_{D}$ depends on the training set, we will analyze the probability to sample a training set for which $\operatorname{err}_{\mathcal{D}}(h)$ is within a proper range. Let $\varepsilon$ be the accuracy parameter, and we will interpret the event $\operatorname{err}_{\mathcal{D}}(h) > \varepsilon$ as severe overfitting. If $\operatorname{err}_{\mathcal{D}}(h) \leq \varepsilon$, we regard the output of the algorithm to be approximately correct predictor as what we define as PAC in the background section. Therefore, we are interested in calculating
+\begin{equation*}
+    P_{\mathcal{S} \sim \mathcal{D}^{m}}([\operatorname{err}_{\mathcal{D}}(h) > \varepsilon] )
+\end{equation*}
+
+Let $E_{B}$ be the set of “bad” hypotheses, that is $ E_{B} = \{h \in \mathcal{H} :\operatorname{err}_{\mathcal{D}}(h) > \varepsilon\}$. The realizability assumption implies that $\operatorname{err}_{\mathcal{S}}(h_{\mathcal{S}}) = 0$ with probability 1. We can infer that the event $E_{B}$ can only happen if for some $h \in E_{B}$ we have $\operatorname{err}_{S}(h) = 0$. Therefore, the set ${\mathcal{S} : \operatorname{err}_{D}(h_{\mathcal{S}}) > \varepsilon}$ is contained in the set ${\mathcal{S} : \exist h \in \mathcal{E}_{B},\operatorname{err}_{S}(h) = 0}$. Therefore,
+\begin{equation*}
+    \underset{S \sim D^{m}}{P}\left[\operatorname{err}_{D}\left(h_{\mathcal{S}}\right)>\epsilon\right] \leq \underset{S \sim D^{m}}{P}\left[\exists h \in E_{B}: \operatorname{err}_{S}(h)=0\right]
+\end{equation*}
+
+\begin{lemma}{\textbf{(Union Bound)}}
+Let $A_{1}$ , . . . , $A_{t}$ be some events then $P(\bigcup_{i=1}^{t}A_{i}) \leq \Sigma_{i=1}^{t}P(A_{i})$
+\end{lemma}
+
+\bigskip
+Rewriting $\left\{S: \exists h \in \mathcal{E}_{B}, \operatorname{err}_{S}(h)=0\right\}$ as $\cup_{h \in \mathcal{E}_{B}}\left\{S: \operatorname{err}_{S}(h)=0\right\}$, we apply union bound to the right-hand side of the previous inequality to get that
+$$
+\underset{S \sim D^{m}}{P}\left[\operatorname{err}_{D}\left(h_{S}\right)>\epsilon\right] \leq \sum_{h \in \mathcal{H}_{B}} \underset{S \sim D^{m}}{P}\left[\operatorname{err}_{S}(h)=0\right]
+$$
+For some fixed bad hypothesis $h \in \mathcal{E}_{B}$, each individual element of the training set we have,
+$$
+\underset{\left(\mathbf{x}_{i}, y_{i}\right) \sim \mathcal{D}}{P}\left[h\left(\mathbf{x}_{i}\right)=y_{i}\right]=1-\operatorname{err}_{\mathcal{D}}(h) \leq 1-\epsilon
+$$
+since the examples in the training set are sampled i.i.d. we get that for all $h \in \mathcal{E}_{B}$
+$$
+\underset{S \sim D^{m}}{P}\left[\operatorname{err}_{S}(h_{\mathcal{S}})=0\right]=\prod_{i=1}^{m} \underset{\left(\mathbf{x}_{i}, y_{i}\right) \sim \mathcal{D}}{P}\left[h\left(\mathbf{x}_{i}\right)=y_{i}\right] \leq(1-\varepsilon)^{m}
+$$
+
+Comparing two inequalities: 
+\[ \begin{cases} 
+      \underset{S \sim D^{m}}{P}\left[\operatorname{err}_{D}\left(h\right)>\epsilon\right] \leq \sum_{h \in \mathcal{E}_{B}} \underset{S \sim D^{m}}{P}\left[\operatorname{err}_{S}(h)=0\right] \\
+     \underset{S \sim D^{m}}{P}\left[\operatorname{err}_{S}(h)=0\right] \leq(1-\varepsilon)^{m} 
+   \end{cases}
+\]
+
+and using the inequality $1-\varepsilon \leq e^{-\varepsilon}$ we conclude that
+$$
+\underset{S \sim D^{m}}{P}\left[\operatorname{err}_{D}\left(h\right)>\varepsilon\right] \leq\left|\mathcal{E}_{B}\right|(1-\varepsilon)^{m} \leq|\mathcal{H}| e^{-\varepsilon m}
+$$
+
+\begin{corollary}
+Let $\mathcal{H}$ be a finite hypothesis class, ERM PAC learns any $f \in \mathcal{H}$ provided $m \geq \frac{1}{\varepsilon}\ln(\frac{|\mathcal{H}|}{\delta})$ with $\delta in (0,1)$ and $\varepsilon >0$. 
+
+\end{corollary}
+
+\begin{proof} 
+Let $E_{B}$ be the set of ``bad" hypothesis. For the $h$ within $\mathcal{E}_{B}$, if $\operatorname{err}(h) > \varepsilon$, each time we draw a random example, $h$ has a probability greater than $\varepsilon$ of making an error because $P_{x \sim D}(h(x) \neq f(x)) = \operatorname{err}(h) > \varepsilon$. The probability that $h$ looks good on any particular element of the training set fooling the algorithm is less than $1-\varepsilon$. Since the elements in the training set are chosen randomly, the probability that one bad $h$ fools the algorithm on all the training set is that:
+ \begin{equation*}
+     P(E_{h}) \leq (1-\varepsilon)^{m} \leq e^{-\varepsilon m}
+ \end{equation*}
+ 
+ 
+ %Suppose we have a random and iid training set $\mathcal{S}$ of size $m$, and we choose $h_{ERM} = \operatorname{argmin}_{h \in \mathcal{H}}\operatorname{err}_{\mathcal{S}}(h)$. Since we include the the true function $f$ in $\mathcal{H}$, we will observe that $\operatorname{err}_{h_{ERM}} = 0$. For a function $\h \in \mathcal{H}$ whose $\operatorname{err}_{\mathcal{S}}(h)$ exceed a given constant $\varepsilon$, we will call it a bad function, and those that satisfy the accuracy bound will be seen as good functions. We want to find the low probability that  $h$ is correct for all the sample set and therefore chosen as the $h_{ERM}$. Namely, $P(\mathcal{S}) = (\exists h\in \mathcal{H},\operatorname{err}(h)>\varepsilon, \operatorname{err}_{\mathcal{S}}(h) = 0)$. If $\operatorname{err}_{\mathcal{S}}(h) = 0$, then $h$ has the potential to be chosen by the algorithm, and we cannot except that if it has high error on the whole data. We are looking at the low probability that there is some bad function with $\operatorname{err}_{\mathcal{S}}(h) = 0$ because we would like to bound the probability that some bad function fools the algorithm. \\
+ 
+ %Let $E_{h}$ be the event that $\operatorname{err}(h) >\varepsilon$ and $\operatorname{err}_{\mathcal{S}}(h)=0$. When $\operatorname{err}(h) >\varepsilon$, every time we draw a random sample, $h$ has a probability greater than $\varepsilon$ of marking an error because $P_{x \sim \mathcal{D}}(h(x) \neq f(x)) = \operatorname{err}(h)>\varepsilon$. Since the elements in the training set are chosen randomly, the probability that $h$ fools the algorithm on all the training set is that:
+ %\begin{equation*}
+    % P(E_{h}) \leq (1-\varepsilon)^{m} \leq e^{-\varepsilon m}
+ %\end{equation*}
+%We can observe that $P(E_{h})$ as we increase the $m$. This bound is set for the situation where there is only a bad function $h$. 
+
+If there are multiple bad functions, using the union bound, we have 
+\begin{equation*}
+\begin{aligned}
+    P(\text{Multiple bad functions}) &= P(\bigcup_{h\in \mathcal{H}})\\
+    & \leq \Sigma_{h\in\mathcal{H}}P(E_{h}) \\
+    & \leq |\mathcal{H}|e^{\varepsilon m}
+\end{aligned}
+\end{equation*}
+If we want to succeed with probability more than $1- \delta$, we can have
+\begin{equation*}
+    \begin{aligned}
+|H| e^{-\epsilon m} &<\delta \\
+\Rightarrow  e^{-\epsilon m} &<\frac{\delta}{|H|} \\
+\Rightarrow  m &\geq \frac{1}{\epsilon} \ln \frac{|H|}{\delta}
+\end{aligned}
+\end{equation*}
+\end{proof}
+
+By rearranging this inequality, we can quantify the uncertainty of our algorithm's in success on the training set. In other words,  for a training set of fixed size $m$, we use the ERM algorithm to obtain $\hat{ERM}$ with  $\operatorname{err}(\hat{ERM})=0$. With respect to the probability, $P(\operatorname{err}(h) \leq \frac{1}{m}\log \frac{|\mathcal{H}|}{\delta}) \geq 1-\delta$. \\ 
+
+There are a number of limitations of ERM PAC learning finite function classes. Typically $\mathcal{H}$ is unknown, because we usually do not have prior knowledge of the class of possible function. In the meantime, it would be difficult to find the best fit $\hat{h}$. Even though ERM indicates that $\hat{h} = \operatorname{arg min}_{h \in \mathcal{H}}\operatorname{err}_{\mathcal{S}}(h)$, while we do not have clear picture of what clever algorithm to use until really trying on a couple of potential algorithms. 
+
+\subsection{Learning any function}
+Recall that in the previous section, the PAC guarantee is based on an important assumption: $f \in \mathcal{H}$, which is formally defined as the realizability assumption in the statistical learning theory. However, the realizability assumption prevents the algorithm from handling noisy data and requires us to choose $\mathcal{H}$ very carefully. This leads us to consider: what if we remove the realizability assumption? The worst situations we should consider is that there is no $h \in \mathcal{H}$ as $f$, or perhaps all $h \in \mathcal{H}$ satisfy  $\operatorname{err}_{\mathcal{S}}-\operatorname{err}(h) < \varepsilon$. The following theorem demonstrates how ERM learns:
+
+\begin{theorem}\cite{Awasthi:3}
+Let $\mathcal{H}$ be finite hypothesis class and $\mathcal{S}$ be the training set. Suppose $|\mathcal{S}| = m$ and $\hat{h} = \operatorname{argmin}_{h \in \mathcal{H}} \operatorname{err}_{\mathcal{S}}(h)$. Then for any $\delta \in (0,1)$, for any $\varepsilon > 0$,
+\begin{enumerate}
+    \item if $m \geq \frac{2}{\varepsilon^2}log(\frac{2|\mathcal{H}|}{\delta})$, then for any $h$, $P(\operatorname{err}_{\mathcal{S}}(h)-\operatorname{err}(h) \leq \varepsilon) \geq 1 - \delta$.
+    \item $P(\operatorname{err}(\hat{h}) \leq \operatorname{h_{ERM}}) + 2\varepsilon) \geq 1- \delta$ where $h_{ERM} = \operatorname{argmin}_{h\in \mathcal{H}} \operatorname{h}$.
+    \end{enumerate}
+\end{theorem}
+
+\noindent The result follows from a well-known principle: Hoeffding's inequality. 
+
+\begin{lemma} 
+(Hoeffding's Inequality)\cite{Nowak}
+Let $X_{1},...,X_{m}$ be iid random variables such that $a_{i}<X<b_{i}$ with probability $1$. Let $S_{n} = \Sigma_{i=1}^{n}X_{i}$, then for any $t>0$,  
+\begin{equation*}
+    P(|S_{n} - E[S_{n}]|\geq t) \leq 2e^{- \frac{2t^2}{\Sigma_{i=1}^{n}(b_{i}-a_{i}^{2})}}
+\end{equation*}
+\end{lemma}
+The intuition for the Hoeffding's Inequality is very simple. We have a bunch of variable $X_{i}$, and we know that when we average a bunch of them up, what we usually get the something close to expected value. The proof of Hoeffding's inequality will be in the appendix. Rewriting the Hoeffding's Inequality in the following form:
+
+\begin{equation*}
+    \mathbb{P}(|\Bar{X}-\mathbb{E}(X)| \geq t) \leq 2e^{-2nt^{2}}
+\end{equation*}
+We will prove two parts of theorem 2 respectively. 
+\begin{proof}{(Theorem 1.1)}
+ We would like to bound the probability that some function $h\in \mathcal{H}$ is a 'bad" function. Recall that a 'bad' function $h\in \mathcal{H}$ is function with $\operatorname{err}_{\mathcal{S}}(h) - \operatorname{err}(h) > \varepsilon$. Namely, bad performance on the whole set/test set. We want to prove the opposite version of $\forall h, P(\operatorname{err}_{\mathcal{S}}(h)-\operatorname{err}(h) \leq \varepsilon) \geq 1 - \delta$: $\exists h$, $P(\operatorname{err}_{\mathcal{S}}(h)-\operatorname{err}(h) \leq \varepsilon) \leq \delta$. Starting from a fixed function $h\in \mathcal{H}$, 
+ \begin{equation*}
+     \operatorname{P}\left[\left|\operatorname{err}_{S}(h)-\operatorname{err}(h)\right|>\epsilon\right]=\operatorname{P}\left[\left|\frac{1}{m} \sum_{i=1}^{m} \mathbf{1}_{i}-\operatorname{err}(h)\right|>\epsilon\right]
+ \end{equation*}
+ where $m$ is the size of the training set $\mathcal{S}$,and $\mathbf{1}_{i}$ is an indicator variable where 
+ \[
+  \mathbf{1}_{i} =
+  \begin{cases}
+                                   1 & \text{if $h(x_{i}) \neq  y_{i}$} \\
+                                   0 & \text{otherwise} 
+  \end{cases}
+\]
+We know that the expected value of $\mathbf{1}_{i}$ is $\operatorname{err}(h)$, so $E(\frac{1}{m}\Sigma_{i=1}^{n}\mathbf{1}_{i}) = \operatorname{err}(h)$. Using Hoeffding's inequality, we can obtain 
+\begin{equation*}
+    \operatorname{P}\left[\left|\frac{1}{m} \sum_{i=1}^{m} \mathbf{1}_{i}-\operatorname{err}(h)\right|>\epsilon\right] \leq 2 e^{-2 m \epsilon^{2}}
+\end{equation*}
+Using the union bound, we have: there exist $h$ such that
+\begin{equation*}
+    \operatorname{P}\left[\exists h \in H:\left|\operatorname{err}_{S}(h)-\operatorname{err}(h)\right|>\epsilon\right] \leq|H|\left(2 e^{-2 m \epsilon^{2}}\right) \leq \delta
+\end{equation*}
+Rewriting this inequality, we can get
+\begin{equation*}
+    m \leq \frac{1}{2\varepsilon^{2}}log(\frac{2|\mathcal{H}|}{\delta})
+\end{equation*}
+\end{proof}
+
+Now let's prove the second part of theorem 1.
+\begin{proof}((Theorem 1.2))
+Let $\hat{h}$ is the function returned by ERM, namely $\hat{h} = \operatorname{argmin}_{h \in \mathcal{H}}\operatorname{err}_{\mathcal{S}}(h)$. From the first part of the proof, we have $\operatorname{err}(\hat{h}) \leq \operatorname{err}_{\mathcal{S}}(\hat{h}) + \varepsilon$. By the definition of $\hat{h}$, $\operatorname{err}(\hat{h}) \leq \operatorname{err}_{\mathcal{S}}(h_{ERM}) + \varepsilon$. Then apply theorem 2.1 to $h_{ERM}$, we can acquire $\operatorname{\hat{h}} \leq \operatorname{err}(h_{ERM}) + 2\varepsilon$
+\end{proof}
+
+Developed from theorem 2, we have an additional corollary for finite class.
+
+\begin{corollary}
+Given a finite function class $\mathcal{H}$, for any $\varepsilon > 0$, $\delta > 0$, any distribution $\mathcal{D}$ over $\mathcal{X}$ and any target function $h*$, let $m$ be the size the training set $\mathcal{S}$, then for any $h \in \mathcal{H}$,
+\begin{equation*}
+    \forall h \in H\left|\operatorname{err}_{S}(h)-\operatorname{err}(h)\right| \leq \sqrt{\frac{1}{2 m} \log \left(\frac{2|H|}{\delta}\right)}
+\end{equation*}
+\end{corollary}
+
+\begin{proof} (Corollary 2)
+Recall that there exist $h\in \mathcal{H}$ such that $P(|\operatorname{err}_{\mathcal{S}}(h) - \operatorname{err}(h)| > \varepsilon) $. Applying Hoeffding's inequality to $\varepsilon = \sqrt{\frac{1}{2m}log(\frac{2|\mathcal{H}|}{\delta})}$, and converting $1 - P(\exsit h\in \mathcal{H}|\operatorname{err}_{\mathcal{S}}(h) - \operatorname{err}(h)| > \varepsilon) $ to $P(\forall h\in \mathcal{H}|\operatorname{err}_{\mathcal{S}}(h) - \operatorname{err}(h)| > \varepsilon)$, we can obtain:
+\begin{equation*}
+    \forall h \in H\left|\operatorname{err}_{S}(h)-\operatorname{err}(h)\right| \leq \sqrt{\frac{1}{2 m} \log \left(\frac{2|H|}{\delta}\right)}
+\end{equation*}
+\end{proof}
